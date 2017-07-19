@@ -35,11 +35,12 @@ public:
 	unsigned waitState() { return m_waitState; }
 	bool submit(Solution solution);
 	void reconnect();
+	void disconnect();
 private:
 	void workLoop() override;
 	void connect();
 	
-	void disconnect();
+	
 	void work_timeout_handler(const boost::system::error_code& ec);
 
 	void processReponse(Json::Value& responseObject);
