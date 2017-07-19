@@ -27,7 +27,7 @@ static void diffToTarget(uint32_t *target, double diff)
 }
 
 
-EthStratumClient::EthStratumClient(Farm* f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email)
+EthStratumClient::EthStratumClient(Farm* f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email, string const & oruser1)
 	: m_socket(m_io_service)
 {
 	m_minerType = m;
@@ -46,6 +46,7 @@ EthStratumClient::EthStratumClient(Farm* f, MinerType m, string const & host, st
 
 	m_protocol = protocol;
 	m_email = email;
+	oruser = oruser1;
 
 	p_farm = f;
 	p_worktimer = nullptr;
@@ -355,7 +356,7 @@ void EthStratumClient::processReponse(Json::Value& responseObject)
 			disconnect();
 			return;
 		}
-		cnote << "Authorized worker " << p_active->user;
+		cnote << "Authorized worker " << oruser;
 		break;
 	case 4:
 		if (responseObject.get("result", false).asBool()) {

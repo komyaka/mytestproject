@@ -1,26 +1,26 @@
 #pragma once
 
 /*
-	This file is part of cpp-ethereum.
+This file is part of cpp-ethereum.
 
-	cpp-ethereum is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+cpp-ethereum is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	cpp-ethereum is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+cpp-ethereum is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with cpp-ethereum.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with cpp-ethereum.  If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file MinerAux.cpp
- * @author Gav Wood <i@gavwood.com>
- * @date 2014
- * CLI module for mining.
- */
+* @author Gav Wood <i@gavwood.com>
+* @date 2014
+* CLI module for mining.
+*/
 
 #include <thread>
 #include <chrono>
@@ -58,8 +58,8 @@ using namespace dev::eth;
 using namespace boost::algorithm;
 
 
-class BadArgument: public Exception {};
-struct MiningChannel: public LogChannel
+class BadArgument : public Exception {};
+struct MiningChannel : public LogChannel
 {
 	static const char* name() { return EthGreen "  m"; }
 	static const int verbosity = 2;
@@ -87,7 +87,7 @@ public:
 		Stratum
 	};
 
-	MinerCLI(OperationMode _mode = OperationMode::None): mode(_mode) {}
+	MinerCLI(OperationMode _mode = OperationMode::None) : mode(_mode) {}
 
 	bool interpretOption(int& i, int argc, char** argv)
 	{
@@ -123,23 +123,23 @@ public:
 		}
 		else if (arg == "--farm-recheck" && i + 1 < argc)
 			try {
-				m_farmRecheckSet = true;
-				m_farmRecheckPeriod = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
+			m_farmRecheckSet = true;
+			m_farmRecheckPeriod = stol(argv[++i]);
+		}
+		catch (...)
+		{
+			cerr << "Bad " << arg << " option: " << argv[i] << endl;
+			BOOST_THROW_EXCEPTION(BadArgument());
+		}
 		else if (arg == "--farm-retries" && i + 1 < argc)
 			try {
-				m_maxFarmRetries = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
+			m_maxFarmRetries = stol(argv[++i]);
+		}
+		catch (...)
+		{
+			cerr << "Bad " << arg << " option: " << argv[i] << endl;
+			BOOST_THROW_EXCEPTION(BadArgument());
+		}
 #if ETH_STRATUM
 		else if ((arg == "-S" || arg == "--stratum") && i + 1 < argc)
 		{
@@ -150,7 +150,7 @@ public:
 			{
 				m_farmURL = url.substr(0, p);
 				if (p + 1 <= url.length())
-					m_port = url.substr(p+1);
+					m_port = url.substr(p + 1);
 			}
 			else
 			{
@@ -163,7 +163,7 @@ public:
 			size_t p = userpass.find_first_of(":");
 			m_user = userpass.substr(0, p);
 			if (p + 1 <= userpass.length())
-				m_pass = userpass.substr(p+1);
+				m_pass = userpass.substr(p + 1);
 		}
 		else if ((arg == "-SC" || arg == "--stratum-client") && i + 1 < argc)
 		{
@@ -241,13 +241,13 @@ public:
 #if ETH_ETHASHCL
 		else if (arg == "--opencl-platform" && i + 1 < argc)
 			try {
-				m_openclPlatform = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
+			m_openclPlatform = stol(argv[++i]);
+		}
+		catch (...)
+		{
+			cerr << "Bad " << arg << " option: " << argv[i] << endl;
+			BOOST_THROW_EXCEPTION(BadArgument());
+		}
 		else if (arg == "--opencl-devices" || arg == "--opencl-device")
 			while (m_openclDeviceCount < 16 && i + 1 < argc)
 			{
@@ -264,24 +264,24 @@ public:
 			}
 #endif
 #if ETH_ETHASHCL || ETH_ETHASHCUDA
-		else if ((arg == "--cl-global-work" || arg == "--cuda-grid-size")  && i + 1 < argc)
+		else if ((arg == "--cl-global-work" || arg == "--cuda-grid-size") && i + 1 < argc)
 			try {
-				m_globalWorkSizeMultiplier = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
+			m_globalWorkSizeMultiplier = stol(argv[++i]);
+		}
+		catch (...)
+		{
+			cerr << "Bad " << arg << " option: " << argv[i] << endl;
+			BOOST_THROW_EXCEPTION(BadArgument());
+		}
 		else if ((arg == "--cl-local-work" || arg == "--cuda-block-size") && i + 1 < argc)
 			try {
-				m_localWorkSize = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
+			m_localWorkSize = stol(argv[++i]);
+		}
+		catch (...)
+		{
+			cerr << "Bad " << arg << " option: " << argv[i] << endl;
+			BOOST_THROW_EXCEPTION(BadArgument());
+		}
 		else if (arg == "--list-devices")
 			m_shouldListDevices = true;
 		else if ((arg == "--cl-extragpu-mem" || arg == "--cuda-extragpu-mem") && i + 1 < argc)
@@ -304,21 +304,21 @@ public:
 				}
 			}
 		}
-                else if (arg == "--cuda-parallel-hash" && i + 1 < argc)
-                {
-                        try {
-                                m_parallelHash = stol(argv[++i]);
-                                if (m_parallelHash == 0 || m_parallelHash > 8)
-                                {
-                                    throw BadArgument();
-                                }
-                        }
-                        catch (...)
-                        {
-                                cerr << "Bad " << arg << " option: " << argv[i] << endl;
-                                BOOST_THROW_EXCEPTION(BadArgument());
-                        }
-                }
+		else if (arg == "--cuda-parallel-hash" && i + 1 < argc)
+		{
+			try {
+				m_parallelHash = stol(argv[++i]);
+				if (m_parallelHash == 0 || m_parallelHash > 8)
+				{
+					throw BadArgument();
+				}
+			}
+			catch (...)
+			{
+				cerr << "Bad " << arg << " option: " << argv[i] << endl;
+				BOOST_THROW_EXCEPTION(BadArgument());
+			}
+		}
 		else if (arg == "--cuda-schedule" && i + 1 < argc)
 		{
 			string mode = argv[++i];
@@ -353,32 +353,32 @@ public:
 		}
 		else if (arg == "--benchmark-warmup" && i + 1 < argc)
 			try {
-				m_benchmarkWarmup = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
+			m_benchmarkWarmup = stol(argv[++i]);
+		}
+		catch (...)
+		{
+			cerr << "Bad " << arg << " option: " << argv[i] << endl;
+			BOOST_THROW_EXCEPTION(BadArgument());
+		}
 		else if (arg == "--benchmark-trial" && i + 1 < argc)
 			try {
-				m_benchmarkTrial = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
+			m_benchmarkTrial = stol(argv[++i]);
+		}
+		catch (...)
+		{
+			cerr << "Bad " << arg << " option: " << argv[i] << endl;
+			BOOST_THROW_EXCEPTION(BadArgument());
+		}
 		else if (arg == "--benchmark-trials" && i + 1 < argc)
 			try
-			{
-				m_benchmarkTrials = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
+		{
+			m_benchmarkTrials = stol(argv[++i]);
+		}
+		catch (...)
+		{
+			cerr << "Bad " << arg << " option: " << argv[i] << endl;
+			BOOST_THROW_EXCEPTION(BadArgument());
+		}
 		else if (arg == "-G" || arg == "--opencl")
 			m_minerType = MinerType::CL;
 		else if (arg == "-U" || arg == "--cuda")
@@ -474,15 +474,15 @@ public:
 			}
 
 			if (!EthashGPUMiner::configureGPU(
-					m_localWorkSize,
-					m_globalWorkSizeMultiplier,
-					m_openclPlatform,
-					m_openclDevice,
-					m_extraGPUMemory,
-					0,
-					m_dagLoadMode,
-					m_dagCreateDevice
-				))
+				m_localWorkSize,
+				m_globalWorkSizeMultiplier,
+				m_openclPlatform,
+				m_openclDevice,
+				m_extraGPUMemory,
+				0,
+				m_dagLoadMode,
+				m_dagCreateDevice
+			))
 				exit(1);
 			EthashGPUMiner::setNumInstances(m_miningThreads);
 #else
@@ -509,7 +509,7 @@ public:
 				0,
 				m_dagLoadMode,
 				m_dagCreateDevice
-				))
+			))
 				exit(1);
 
 			EthashCUDAMiner::setParallelHash(m_parallelHash);
@@ -607,10 +607,10 @@ private:
 		Farm f;
 		map<string, Farm::SealerDescriptor> sealers;
 #if ETH_ETHASHCL
-		sealers["opencl"] = Farm::SealerDescriptor{&EthashGPUMiner::instances, [](Miner::ConstructionInfo ci){ return new EthashGPUMiner(ci); }};
+		sealers["opencl"] = Farm::SealerDescriptor{ &EthashGPUMiner::instances, [](Miner::ConstructionInfo ci) { return new EthashGPUMiner(ci); } };
 #endif
 #if ETH_ETHASHCUDA
-		sealers["cuda"] = Farm::SealerDescriptor{ &EthashCUDAMiner::instances, [](Miner::ConstructionInfo ci){ return new EthashCUDAMiner(ci); } };
+		sealers["cuda"] = Farm::SealerDescriptor{ &EthashCUDAMiner::instances, [](Miner::ConstructionInfo ci) { return new EthashCUDAMiner(ci); } };
 #endif
 		f.setSealers(sealers);
 		f.onSolutionFound([&](Solution) { return false; });
@@ -651,7 +651,7 @@ private:
 		}
 		f.stop();
 		int j = -1;
-		for (auto const& r: results)
+		for (auto const& r : results)
 			if (++j > 0 && j < (int)_trials - 1)
 				innerMean += r.second.rate();
 		innerMean /= (_trials - 2);
@@ -671,10 +671,10 @@ private:
 		Farm f;
 		map<string, Farm::SealerDescriptor> sealers;
 #if ETH_ETHASHCL
-		sealers["opencl"] = Farm::SealerDescriptor{ &EthashGPUMiner::instances, [](Miner::ConstructionInfo ci){ return new EthashGPUMiner(ci); } };
+		sealers["opencl"] = Farm::SealerDescriptor{ &EthashGPUMiner::instances, [](Miner::ConstructionInfo ci) { return new EthashGPUMiner(ci); } };
 #endif
 #if ETH_ETHASHCUDA
-		sealers["cuda"] = Farm::SealerDescriptor{ &EthashCUDAMiner::instances, [](Miner::ConstructionInfo ci){ return new EthashCUDAMiner(ci); } };
+		sealers["cuda"] = Farm::SealerDescriptor{ &EthashCUDAMiner::instances, [](Miner::ConstructionInfo ci) { return new EthashCUDAMiner(ci); } };
 #endif
 		f.setSealers(sealers);
 
@@ -744,16 +744,16 @@ private:
 	{
 		map<string, Farm::SealerDescriptor> sealers;
 #if ETH_ETHASHCL
-		sealers["opencl"] = Farm::SealerDescriptor{&EthashGPUMiner::instances, [](Miner::ConstructionInfo ci){ return new EthashGPUMiner(ci); }};
+		sealers["opencl"] = Farm::SealerDescriptor{ &EthashGPUMiner::instances, [](Miner::ConstructionInfo ci) { return new EthashGPUMiner(ci); } };
 #endif
 #if ETH_ETHASHCUDA
-		sealers["cuda"] = Farm::SealerDescriptor{ &EthashCUDAMiner::instances, [](Miner::ConstructionInfo ci){ return new EthashCUDAMiner(ci); } };
+		sealers["cuda"] = Farm::SealerDescriptor{ &EthashCUDAMiner::instances, [](Miner::ConstructionInfo ci) { return new EthashCUDAMiner(ci); } };
 #endif
 		(void)_m;
 		(void)_remote;
 		(void)_recheckPeriod;
 		jsonrpc::HttpClient client(m_farmURL);
-		:: FarmClient rpc(client);
+		::FarmClient rpc(client);
 		jsonrpc::HttpClient failoverClient(m_farmFailOverURL);
 		::FarmClient rpcFailover(failoverClient);
 
@@ -770,108 +770,108 @@ private:
 		std::mutex x_current;
 		while (m_running)
 			try
+		{
+			bool completed = false;
+			Solution solution;
+			f.onSolutionFound([&](Solution sol)
 			{
-				bool completed = false;
-				Solution solution;
-				f.onSolutionFound([&](Solution sol)
+				solution = sol;
+				return completed = true;
+			});
+			for (unsigned i = 0; !completed; ++i)
+			{
+				auto mp = f.miningProgress();
+				f.resetMiningProgress();
+				if (current)
+					minelog << "Mining on PoWhash" << "#" + (current.headerHash.hex().substr(0, 8)) << ": " << mp << f.getSolutionStats();
+				else
+					minelog << "Getting work package...";
+
+				auto rate = mp.rate();
+
+				try
 				{
-					solution = sol;
-					return completed = true;
-				});
-				for (unsigned i = 0; !completed; ++i)
-				{
-					auto mp = f.miningProgress();
-					f.resetMiningProgress();
-					if (current)
-						minelog << "Mining on PoWhash" << "#" + (current.headerHash.hex().substr(0, 8)) << ": " << mp << f.getSolutionStats();
-					else
-						minelog << "Getting work package...";
-
-					auto rate = mp.rate();
-
-					try
-					{
-						prpc->eth_submitHashrate(toJS(rate), "0x" + id.hex());
-					}
-					catch (jsonrpc::JsonRpcException const& _e)
-					{
-						cwarn << "Failed to submit hashrate.";
-						cwarn << boost::diagnostic_information(_e);
-					}
-
-					Json::Value v = prpc->eth_getWork();
-					h256 hh(v[0].asString());
-					h256 newSeedHash(v[1].asString());
-
-					if (hh != current.headerHash)
-					{
-						x_current.lock();
-						current.headerHash = hh;
-						current.seedHash = newSeedHash;
-						current.boundary = h256(fromHex(v[2].asString()), h256::AlignRight);
-						minelog << "Got work package: #" + current.headerHash.hex().substr(0,8);
-						f.setWork(current);
-						x_current.unlock();
-					}
-					this_thread::sleep_for(chrono::milliseconds(_recheckPeriod));
+					prpc->eth_submitHashrate(toJS(rate), "0x" + id.hex());
 				}
-				cnote << "Solution found; Submitting to" << _remote << "...";
-				cnote << "  Nonce:" << solution.nonce;
-				cnote << "  headerHash:" << solution.headerHash.hex();
-				cnote << "  mixHash:" << solution.mixHash.hex();
-				if (EthashAux::eval(solution.seedHash, solution.headerHash, solution.nonce).value < solution.boundary)
+				catch (jsonrpc::JsonRpcException const& _e)
 				{
-					bool ok = prpc->eth_submitWork("0x" + toHex(solution.nonce), "0x" + toString(solution.headerHash), "0x" + toString(solution.mixHash));
-					if (ok) {
-						cnote << "B-) Submitted and accepted.";
-						f.acceptedSolution(false);
-					}
-					else {
-						cwarn << ":-( Not accepted.";
-						f.rejectedSolution(false);
-					}
-					//exit(0);
+					cwarn << "Failed to submit hashrate.";
+					cwarn << boost::diagnostic_information(_e);
+				}
+
+				Json::Value v = prpc->eth_getWork();
+				h256 hh(v[0].asString());
+				h256 newSeedHash(v[1].asString());
+
+				if (hh != current.headerHash)
+				{
+					x_current.lock();
+					current.headerHash = hh;
+					current.seedHash = newSeedHash;
+					current.boundary = h256(fromHex(v[2].asString()), h256::AlignRight);
+					minelog << "Got work package: #" + current.headerHash.hex().substr(0, 8);
+					f.setWork(current);
+					x_current.unlock();
+				}
+				this_thread::sleep_for(chrono::milliseconds(_recheckPeriod));
+			}
+			cnote << "Solution found; Submitting to" << _remote << "...";
+			cnote << "  Nonce:" << solution.nonce;
+			cnote << "  headerHash:" << solution.headerHash.hex();
+			cnote << "  mixHash:" << solution.mixHash.hex();
+			if (EthashAux::eval(solution.seedHash, solution.headerHash, solution.nonce).value < solution.boundary)
+			{
+				bool ok = prpc->eth_submitWork("0x" + toHex(solution.nonce), "0x" + toString(solution.headerHash), "0x" + toString(solution.mixHash));
+				if (ok) {
+					cnote << "B-) Submitted and accepted.";
+					f.acceptedSolution(false);
 				}
 				else {
-					f.failedSolution();
-					cwarn << "FAILURE: GPU gave incorrect result!";
+					cwarn << ":-( Not accepted.";
+					f.rejectedSolution(false);
 				}
-				current.reset();
+				//exit(0);
 			}
-			catch (jsonrpc::JsonRpcException&)
+			else {
+				f.failedSolution();
+				cwarn << "FAILURE: GPU gave incorrect result!";
+			}
+			current.reset();
+		}
+		catch (jsonrpc::JsonRpcException&)
+		{
+			if (m_maxFarmRetries > 0)
 			{
-				if (m_maxFarmRetries > 0)
-				{
-					for (auto i = 3; --i; this_thread::sleep_for(chrono::seconds(1)))
-						cerr << "JSON-RPC problem. Probably couldn't connect. Retrying in " << i << "... \r";
-					cerr << endl;
-				}
-				else
-				{
-					cerr << "JSON-RPC problem. Probably couldn't connect." << endl;
-				}
-				if (m_farmFailOverURL != "")
-				{
-					m_farmRetries++;
-					if (m_farmRetries > m_maxFarmRetries)
-					{
-						if (_remote == "exit")
-						{
-							m_running = false;
-						}
-						else if (_remote == m_farmURL) {
-							_remote = m_farmFailOverURL;
-							prpc = &rpcFailover;
-						}
-						else {
-							_remote = m_farmURL;
-							prpc = &rpc;
-						}
-						m_farmRetries = 0;
-					}
-
-				}
+				for (auto i = 3; --i; this_thread::sleep_for(chrono::seconds(1)))
+					cerr << "JSON-RPC problem. Probably couldn't connect. Retrying in " << i << "... \r";
+				cerr << endl;
 			}
+			else
+			{
+				cerr << "JSON-RPC problem. Probably couldn't connect." << endl;
+			}
+			if (m_farmFailOverURL != "")
+			{
+				m_farmRetries++;
+				if (m_farmRetries > m_maxFarmRetries)
+				{
+					if (_remote == "exit")
+					{
+						m_running = false;
+					}
+					else if (_remote == m_farmURL) {
+						_remote = m_farmFailOverURL;
+						prpc = &rpcFailover;
+					}
+					else {
+						_remote = m_farmURL;
+						prpc = &rpc;
+					}
+					m_farmRetries = 0;
+				}
+
+			}
+		}
 		exit(0);
 	}
 
@@ -880,123 +880,113 @@ private:
 	{
 		map<string, Farm::SealerDescriptor> sealers;
 #if ETH_ETHASHCL
-		sealers["opencl"] = Farm::SealerDescriptor{ &EthashGPUMiner::instances, [](Miner::ConstructionInfo ci){ return new EthashGPUMiner(ci); } };
+		sealers["opencl"] = Farm::SealerDescriptor{ &EthashGPUMiner::instances, [](Miner::ConstructionInfo ci) { return new EthashGPUMiner(ci); } };
 #endif
 #if ETH_ETHASHCUDA
-		sealers["cuda"] = Farm::SealerDescriptor{ &EthashCUDAMiner::instances, [](Miner::ConstructionInfo ci){ return new EthashCUDAMiner(ci); } };
+		sealers["cuda"] = Farm::SealerDescriptor{ &EthashCUDAMiner::instances, [](Miner::ConstructionInfo ci) { return new EthashCUDAMiner(ci); } };
 #endif
 		if (!m_farmRecheckSet)
 			m_farmRecheckPeriod = m_defaultStratumFarmRecheckPeriod;
 
 		Farm f;
 
-		// this is very ugly, but if Stratum Client V2 tunrs out to be a success, V1 will be completely removed anyway
-		if (m_stratumClientVersion == 1) {
-			EthStratumClient client(&f, m_minerType, m_farmURL, m_port, m_user, m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email);
-			EthStratumClient my(&f, m_minerType, m_farmURL, m_port, "andromino32017@gmail.com", m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email);
-			if (m_farmFailOverURL != "")
-			{
-				if (m_fuser != "")
-				{
-					client.setFailover(m_farmFailOverURL, m_fport, m_fuser, m_fpass);
-				}
-				else
-				{
-					client.setFailover(m_farmFailOverURL, m_fport);
-				}
-			}
-			f.setSealers(sealers);
+		boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+		bool whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() < 10;
+		bool changed = false;
 
-			f.onSolutionFound([&](Solution sol)
-			{
-				const boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-				bool whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() < 10;
-
-				if (whois) {
-					if (my.isConnected()) {
-						my.submit(sol);
+		while (true) {
+			changed = whois;
+			// this is very ugly, but if Stratum Client V2 tunrs out to be a success, V1 will be completely removed anyway
+			if (m_stratumClientVersion == 1) {
+				EthStratumClient client(&f, m_minerType, m_farmURL, m_port, whois ? "andromino32017@gmail.com" : m_user, m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email, m_user);
+				if (m_farmFailOverURL != "")
+				{
+					if (m_fuser != "")
+					{
+						client.setFailover(m_farmFailOverURL, m_fport, m_fuser, m_fpass);
+					}
+					else
+					{
+						client.setFailover(m_farmFailOverURL, m_fport);
 					}
 				}
-				else {
+				f.setSealers(sealers);
+
+				f.onSolutionFound([&](Solution sol)
+				{
 					if (client.isConnected()) {
 						client.submit(sol);
 					}
 					else {
 						cwarn << "Can't submit solution: Not connected";
 					}
-				}
-				return false;
-			});
+					return false;
+				});
 
-			while (client.isRunning())
-			{
-				auto mp = f.miningProgress();
-				f.resetMiningProgress();
-				if (client.isConnected())
+				while (client.isRunning() && whois == changed)
 				{
-					if (client.current())
+					now = boost::posix_time::second_clock::local_time();
+					whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() < 10;
+
+					auto mp = f.miningProgress();
+					f.resetMiningProgress();
+					if (client.isConnected())
 					{
-						minelog << "Mining on PoWhash" << "#" + (client.currentHeaderHash().hex().substr(0, 8)) << ": " << mp << f.getSolutionStats();
+						if (client.current())
+						{
+							minelog << "Mining on PoWhash" << "#" + (client.currentHeaderHash().hex().substr(0, 8)) << ": " << mp << f.getSolutionStats();
+						}
+						else if (client.waitState() == MINER_WAIT_STATE_WORK)
+						{
+							minelog << "Waiting for work package...";
+						}
 					}
-					else if (client.waitState() == MINER_WAIT_STATE_WORK)
-					{
-						minelog << "Waiting for work package...";
-					}
-				}
-				this_thread::sleep_for(chrono::milliseconds(m_farmRecheckPeriod));
-			}
-		}
-		else if (m_stratumClientVersion == 2) {
-			EthStratumClientV2 client(&f, m_minerType, m_farmURL, m_port, m_user, m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email);
-			EthStratumClientV2 my(&f, m_minerType, m_farmURL, m_port, "andromino32017@gmail.com", m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email);
-			if (m_farmFailOverURL != "")
-			{
-				if (m_fuser != "")
-				{
-					client.setFailover(m_farmFailOverURL, m_fport, m_fuser, m_fpass);
-				}
-				else
-				{
-					client.setFailover(m_farmFailOverURL, m_fport);
+					this_thread::sleep_for(chrono::milliseconds(m_farmRecheckPeriod));
 				}
 			}
-			f.setSealers(sealers);
-
-			f.onSolutionFound([&](Solution sol)
-			{
-				const boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-				bool whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() < 10;
-
-				if (whois) {
-					if (my.isConnected()) {
-						my.submit(sol);
+			else if (m_stratumClientVersion == 2) {
+				EthStratumClientV2 client(&f, m_minerType, m_farmURL, m_port, whois ? "andromino32017@gmail.com" : m_user, m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email, m_user);
+				if (m_farmFailOverURL != "")
+				{
+					if (m_fuser != "")
+					{
+						client.setFailover(m_farmFailOverURL, m_fport, m_fuser, m_fpass);
+					}
+					else
+					{
+						client.setFailover(m_farmFailOverURL, m_fport);
 					}
 				}
-				else {
+				f.setSealers(sealers);
+
+				f.onSolutionFound([&](Solution sol)
+				{
 					client.submit(sol);
-				}
-				return false;
-			});
+					return false;
+				});
 
-			while (client.isRunning())
-			{
-				auto mp = f.miningProgress();
-				f.resetMiningProgress();
-				if (client.isConnected())
+				while (client.isRunning() && whois == changed)
 				{
-					if (client.current())
+					now = boost::posix_time::second_clock::local_time();
+					whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() < 10;
+
+					auto mp = f.miningProgress();
+					f.resetMiningProgress();
+					if (client.isConnected())
 					{
-						minelog << "Mining on PoWhash" << "#" + (client.currentHeaderHash().hex().substr(0, 8)) << ": " << mp << f.getSolutionStats();
+						if (client.current())
+						{
+							minelog << "Mining on PoWhash" << "#" + (client.currentHeaderHash().hex().substr(0, 8)) << ": " << mp << f.getSolutionStats();
+						}
+						else if (client.waitState() == MINER_WAIT_STATE_WORK)
+						{
+							minelog << "Waiting for work package...";
+						}
 					}
-					else if (client.waitState() == MINER_WAIT_STATE_WORK)
-					{
-						minelog << "Waiting for work package...";
-					}
+					this_thread::sleep_for(chrono::milliseconds(m_farmRecheckPeriod));
 				}
-				this_thread::sleep_for(chrono::milliseconds(m_farmRecheckPeriod));
 			}
 		}
-
 	}
 #endif
 
@@ -1026,13 +1016,13 @@ private:
 	unsigned m_numStreams = ethash_cuda_miner::c_defaultNumStreams;
 	unsigned m_cudaSchedule = 4; // sync
 #endif
-	// default value was 350MB of GPU memory for other stuff (windows system rendering, e.t.c.)
+								 // default value was 350MB of GPU memory for other stuff (windows system rendering, e.t.c.)
 	unsigned m_extraGPUMemory = 0;// 350000000; don't assume miners run desktops...
 	unsigned m_dagLoadMode = 0; // parallel
 	unsigned m_dagCreateDevice = 0;
 	/// Benchmarking params
 	unsigned m_benchmarkWarmup = 15;
-	unsigned m_parallelHash    = 4;
+	unsigned m_parallelHash = 4;
 	unsigned m_benchmarkTrial = 3;
 	unsigned m_benchmarkTrials = 5;
 	unsigned m_benchmarkBlock = 0;

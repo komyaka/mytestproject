@@ -21,7 +21,7 @@ using namespace dev::eth;
 class EthStratumClient
 {
 public:
-	EthStratumClient(Farm* f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email);
+	EthStratumClient(Farm* f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email, string const & oruser);
 	~EthStratumClient();
 
 	void setFailover(string const & host, string const & port);
@@ -75,6 +75,7 @@ private:
 
 	bool m_stale = false;
 
+	string oruser;
 	string m_job;
 	string m_previousJob;
 
