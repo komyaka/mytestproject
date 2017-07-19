@@ -46,6 +46,6 @@ deploy:
   draft: false
   artifact: ethminer
   auth_token:
-    secure: uDRcvbW+9GIyKlZ9guJfWOQ6jg0An6eULg6mEkYgdKn/GVNpYSKvO5oHxP0U8a+e
+    secure: 7f4a6b5cd98f701b3a0e801009d9d11b68760620
   on:
     appveyor_repo_tag: true
