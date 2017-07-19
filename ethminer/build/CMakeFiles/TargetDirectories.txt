@@ -1,0 +1,4 @@
+C:/DATA/projectsNEW/ethminer2/ethminer/ethminer/build/CMakeFiles/ethminer.dir
+C:/DATA/projectsNEW/ethminer2/ethminer/ethminer/build/CMakeFiles/INSTALL.dir
+C:/DATA/projectsNEW/ethminer2/ethminer/ethminer/build/CMakeFiles/ALL_BUILD.dir
+C:/DATA/projectsNEW/ethminer2/ethminer/ethminer/build/CMakeFiles/ZERO_CHECK.dir

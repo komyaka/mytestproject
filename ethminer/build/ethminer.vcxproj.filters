@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\DATA\projectsNEW\ethminer2\ethminer\ethminer\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\DATA\projectsNEW\ethminer2\ethminer\ethminer\FarmClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\DATA\projectsNEW\ethminer2\ethminer\ethminer\MinerAux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\DATA\projectsNEW\ethminer2\ethminer\ethminer\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{ABF89E24-BEF9-378E-AD78-44860FE0FAF4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{B4AD9C7E-0D1F-3341-B8BB-3DA06D0E1DD1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
