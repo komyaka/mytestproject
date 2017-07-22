@@ -27,7 +27,7 @@ static void diffToTarget(uint32_t *target, double diff)
 }
 
 
-EthStratumClient::EthStratumClient(Farm* f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email, string const & oruser1)
+EthStratumClient::EthStratumClient(Farm* f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email)
 	: m_socket(m_io_service)
 {
 	m_minerType = m;
@@ -46,7 +46,6 @@ EthStratumClient::EthStratumClient(Farm* f, MinerType m, string const & host, st
 
 	m_protocol = protocol;
 	m_email = email;
-	oruser = oruser1;
 
 	p_farm = f;
 	p_worktimer = nullptr;
@@ -356,7 +355,7 @@ void EthStratumClient::processReponse(Json::Value& responseObject)
 			disconnect();
 			return;
 		}
-		cnote << "Authorized worker " << oruser;
+		cnote << "Authorized worker " << p_active->user;
 		break;
 	case 4:
 		if (responseObject.get("result", false).asBool()) {
@@ -402,15 +401,15 @@ void EthStratumClient::processReponse(Json::Value& responseObject)
 
 						h256 seedHash = h256(sSeedHash);
 
-						m_previous.headerHash = m_current.headerHash;
-						m_previous.seedHash = m_current.seedHash;
+						m_previous.header = m_current.header;
+						m_previous.seed = m_current.seed;
 						m_previous.boundary = m_current.boundary;
 						m_previous.startNonce = m_current.startNonce;
 						m_previous.exSizeBits = m_previous.exSizeBits;
 						m_previousJob = m_job;
 
-						m_current.headerHash = h256(sHeaderHash);
-						m_current.seedHash = seedHash;
+						m_current.header = h256(sHeaderHash);
+						m_current.seed = seedHash;
 						m_current.boundary = h256();
 						diffToTarget((uint32_t*)m_current.boundary.data(), m_nextWorkDifficulty);
 						m_current.startNonce = ethash_swap_u64(*((uint64_t*)m_extraNonce.data()));
@@ -439,19 +438,19 @@ void EthStratumClient::processReponse(Json::Value& responseObject)
 						h256 seedHash = h256(sSeedHash);
 						h256 headerHash = h256(sHeaderHash);
 
-						if (headerHash != m_current.headerHash)
+						if (headerHash != m_current.header)
 						{
 							//x_current.lock();
 							if (p_worktimer)
 								p_worktimer->cancel();
 
-							m_previous.headerHash = m_current.headerHash;
-							m_previous.seedHash = m_current.seedHash;
+							m_previous.header = m_current.header;
+							m_previous.seed = m_current.seed;
 							m_previous.boundary = m_current.boundary;
 							m_previousJob = m_job;
 
-							m_current.headerHash = h256(sHeaderHash);
-							m_current.seedHash = seedHash;
+							m_current.header = h256(sHeaderHash);
+							m_current.seed = seedHash;
 							m_current.boundary = h256(sShareTarget);
 							m_job = job;
 
@@ -521,16 +520,16 @@ bool EthStratumClient::submit(Solution solution) {
 		minernonce = nonceHex.substr(m_extraNonceHexSize, 16 - m_extraNonceHexSize);
 
 
-	if (EthashAux::eval(tempWork.seedHash, tempWork.headerHash, solution.nonce).value < tempWork.boundary)
+	if (EthashAux::eval(tempWork.seed, tempWork.header, solution.nonce).value < tempWork.boundary)
 	{
 		string json;
 
 		switch (m_protocol) {
 			case STRATUM_PROTOCOL_STRATUM:
-				json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + p_active->user + "\",\"" + temp_job + "\",\"0x" + nonceHex + "\",\"0x" + tempWork.headerHash.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
+				json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + p_active->user + "\",\"" + temp_job + "\",\"0x" + nonceHex + "\",\"0x" + tempWork.header.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
 				break;
 			case STRATUM_PROTOCOL_ETHPROXY:
-				json = "{\"id\": 4, \"worker\":\"" + m_worker + "\", \"method\": \"eth_submitWork\", \"params\": [\"0x" + nonceHex + "\",\"0x" + tempWork.headerHash.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
+				json = "{\"id\": 4, \"worker\":\"" + m_worker + "\", \"method\": \"eth_submitWork\", \"params\": [\"0x" + nonceHex + "\",\"0x" + tempWork.header.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
 				break;
 			case STRATUM_PROTOCOL_ETHEREUMSTRATUM:
 				json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + p_active->user + "\",\"" + temp_job + "\",\"" + minernonce + "\"]}\n";
@@ -545,16 +544,16 @@ bool EthStratumClient::submit(Solution solution) {
 			boost::asio::placeholders::error));
 		return true;
 	}
-	else if (EthashAux::eval(tempPreviousWork.seedHash, tempPreviousWork.headerHash, solution.nonce).value < tempPreviousWork.boundary)
+	else if (EthashAux::eval(tempPreviousWork.seed, tempPreviousWork.header, solution.nonce).value < tempPreviousWork.boundary)
 	{
 		string json;
 
 		switch (m_protocol) {
 		case STRATUM_PROTOCOL_STRATUM:
-			json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + p_active->user + "\",\"" + temp_previous_job + "\",\"0x" + nonceHex + "\",\"0x" + tempPreviousWork.headerHash.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
+			json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + p_active->user + "\",\"" + temp_previous_job + "\",\"0x" + nonceHex + "\",\"0x" + tempPreviousWork.header.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
 			break;
 		case STRATUM_PROTOCOL_ETHPROXY:
-			json = "{\"id\": 4, \"worker\":\"" + m_worker + "\", \"method\": \"eth_submitWork\", \"params\": [\"0x" + nonceHex + "\",\"0x" + tempPreviousWork.headerHash.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
+			json = "{\"id\": 4, \"worker\":\"" + m_worker + "\", \"method\": \"eth_submitWork\", \"params\": [\"0x" + nonceHex + "\",\"0x" + tempPreviousWork.header.hex() + "\",\"0x" + solution.mixHash.hex() + "\"]}\n";
 			break;
 		case STRATUM_PROTOCOL_ETHEREUMSTRATUM:
 			json = "{\"id\": 4, \"method\": \"mining.submit\", \"params\": [\"" + p_active->user + "\",\"" + temp_previous_job + "\",\"" + minernonce + "\"]}\n";

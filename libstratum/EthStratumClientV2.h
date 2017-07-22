@@ -22,7 +22,7 @@ using namespace dev::eth;
 class EthStratumClientV2 : public Worker
 {
 public:
-	EthStratumClientV2(Farm* f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email, string const & oruser);
+	EthStratumClientV2(Farm* f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email);
 	~EthStratumClientV2();
 
 	void setFailover(string const & host, string const & port);
@@ -30,7 +30,7 @@ public:
 
 	bool isRunning() { return m_running; }
 	bool isConnected() { return m_connected && m_authorized; }
-	h256 currentHeaderHash() { return m_current.headerHash; }
+	h256 currentHeaderHash() { return m_current.header; }
 	bool current() { return m_current; }
 	unsigned waitState() { return m_waitState; }
 	bool submit(Solution solution);
@@ -72,7 +72,6 @@ private:
 
 	bool m_stale = false;
 
-	string oruser;
 	string m_job;
 	string m_previousJob;
 

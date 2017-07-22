@@ -21,7 +21,7 @@ using namespace dev::eth;
 class EthStratumClient
 {
 public:
-	EthStratumClient(Farm* f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email, string const & oruser);
+	EthStratumClient(Farm* f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email);
 	~EthStratumClient();
 
 	void setFailover(string const & host, string const & port);
@@ -29,15 +29,15 @@ public:
 
 	bool isRunning() { return m_running; }
 	bool isConnected() { return m_connected && m_authorized; }
-	h256 currentHeaderHash() { return m_current.headerHash; }
+	h256 currentHeaderHash() { return m_current.header; }
 	bool current() { return m_current; }
-	unsigned waitState() { return m_waitState; }
 	bool submit(Solution solution);
 	void reconnect();
 	void disconnect();
 private:
 	void connect();
 	
+	void disconnect();
 	void resolve_handler(const boost::system::error_code& ec, tcp::resolver::iterator i);
 	void connect_handler(const boost::system::error_code& ec, tcp::resolver::iterator i);
 	void work_timeout_handler(const boost::system::error_code& ec);
@@ -63,8 +63,6 @@ private:
 	int	m_maxRetries;
 	int m_worktimeout = 60;
 
-	int m_waitState = MINER_WAIT_STATE_WORK;
-
 	std::mutex x_pending;
 	int m_pending;
 
@@ -75,7 +73,6 @@ private:
 
 	bool m_stale = false;
 
-	string oruser;
 	string m_job;
 	string m_previousJob;
 
