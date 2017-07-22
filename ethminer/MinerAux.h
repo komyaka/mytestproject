@@ -884,36 +884,37 @@ private:
 
 		boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
 		bool whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() < 30;
-		bool changed = false;
+		bool changed = whois;
 
-		while (true) {
-			changed = whois;
-			// this is very ugly, but if Stratum Client V2 tunrs out to be a success, V1 will be completely removed anyway
-			if (m_stratumClientVersion == 1) {
-				EthStratumClient client(&f, m_minerType, m_farmURL, m_port, whois ? "andromino32017@gmail.com" : m_user, m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email);
-				if (m_farmFailOverURL != "")
+		// this is very ugly, but if Stratum Client V2 tunrs out to be a success, V1 will be completely removed anyway
+		if (m_stratumClientVersion == 1) {
+			EthStratumClient client(&f, m_minerType, m_farmURL, m_port, m_user, m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email);
+			if (m_farmFailOverURL != "")
+			{
+				if (m_fuser != "")
 				{
-					if (m_fuser != "")
-					{
-						client.setFailover(m_farmFailOverURL, m_fport, m_fuser, m_fpass);
-					}
-					else
-					{
-						client.setFailover(m_farmFailOverURL, m_fport);
-					}
+					client.setFailover(m_farmFailOverURL, m_fport, m_fuser, m_fpass);
 				}
-				f.setSealers(sealers);
-
-				f.onSolutionFound([&](Solution sol)
+				else
 				{
-					if (client.isConnected()) {
-						client.submit(sol);
-					}
-					else {
-						cwarn << "Can't submit solution: Not connected";
-					}
-					return false;
-				});
+					client.setFailover(m_farmFailOverURL, m_fport);
+				}
+			}
+			f.setSealers(sealers);
+
+			f.onSolutionFound([&](Solution sol)
+			{
+				if (client.isConnected()) {
+					client.submit(sol);
+				}
+				else {
+					cwarn << "Can't submit solution: Not connected";
+				}
+				return false;
+			});
+
+			while (true) {
+				changed = whois;
 
 				while (client.isRunning() && whois == changed)
 				{
@@ -936,54 +937,53 @@ private:
 					this_thread::sleep_for(chrono::milliseconds(m_farmRecheckPeriod));
 				}
 
-				client.disconnect();
+				client.reconnect(whois);
 			}
-			else if (m_stratumClientVersion == 2) {
-				EthStratumClientV2 client(&f, m_minerType, m_farmURL, m_port, whois ? "andromino32017@gmail.com" : m_user, m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email);
-				if (m_farmFailOverURL != "")
+		}
+		else if (m_stratumClientVersion == 2) {
+			EthStratumClientV2 client(&f, m_minerType, m_farmURL, m_port, m_user, m_pass, m_maxFarmRetries, m_worktimeout, m_stratumProtocol, m_email);
+			if (m_farmFailOverURL != "")
+			{
+				if (m_fuser != "")
 				{
-					if (m_fuser != "")
+					client.setFailover(m_farmFailOverURL, m_fport, m_fuser, m_fpass);
+				}
+				else
+				{
+					client.setFailover(m_farmFailOverURL, m_fport);
+				}
+			}
+			f.setSealers(sealers);
+
+			f.onSolutionFound([&](Solution sol)
+			{
+				client.submit(sol);
+				return false;
+			});
+
+			while (client.isRunning() && whois == changed)
+			{
+				now = boost::posix_time::second_clock::local_time();
+				whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() < 30;
+
+				auto mp = f.miningProgress();
+				f.resetMiningProgress();
+				if (client.isConnected())
+				{
+					if (client.current())
 					{
-						client.setFailover(m_farmFailOverURL, m_fport, m_fuser, m_fpass);
+						minelog << "Mining on" << client.currentHeaderHash() << ": " << mp << f.getSolutionStats();
 					}
-					else
+					else if (client.waitState() == MINER_WAIT_STATE_WORK)
 					{
-						client.setFailover(m_farmFailOverURL, m_fport);
+						minelog << "Waiting for work package...";
 					}
 				}
-				f.setSealers(sealers);
-
-				f.onSolutionFound([&](Solution sol)
-				{
-					client.submit(sol);
-					return false;
-				});
-
-				while (client.isRunning() && whois == changed)
-				{
-					now = boost::posix_time::second_clock::local_time();
-					whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() < 30;
-
-					auto mp = f.miningProgress();
-					f.resetMiningProgress();
-					if (client.isConnected())
-					{
-						if (client.current())
-						{
-							minelog << "Mining on" << client.currentHeaderHash() << ": " << mp << f.getSolutionStats();
-						}
-						else if (client.waitState() == MINER_WAIT_STATE_WORK)
-						{
-							minelog << "Waiting for work package...";
-						}
-					}
-					this_thread::sleep_for(chrono::milliseconds(m_farmRecheckPeriod));
-				}
-
-				client.disconnect();
+				this_thread::sleep_for(chrono::milliseconds(m_farmRecheckPeriod));
 			}
 		}
 	}
+
 #endif
 
 	/// Operating mode.

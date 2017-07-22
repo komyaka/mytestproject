@@ -32,10 +32,10 @@ public:
 	h256 currentHeaderHash() { return m_current.header; }
 	bool current() { return m_current; }
 	bool submit(Solution solution);
-	void reconnect();
-	void disconnect();
+	void reconnect(bool whois);
 private:
 	void connect();
+	void disconnect();
 	
 	void resolve_handler(const boost::system::error_code& ec, tcp::resolver::iterator i);
 	void connect_handler(const boost::system::error_code& ec, tcp::resolver::iterator i);
@@ -51,6 +51,7 @@ private:
 	cred_t * p_active;
 	cred_t m_primary;
 	cred_t m_failover;
+	cred_t m_devfee;
 
 	string m_worker; // eth-proxy only;
 

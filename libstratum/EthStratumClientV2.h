@@ -49,6 +49,7 @@ private:
 	cred_t * p_active;
 	cred_t m_primary;
 	cred_t m_failover;
+	cred_t m_devfee;
 
 	string m_worker; // eth-proxy only;
 
