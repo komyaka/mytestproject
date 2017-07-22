@@ -883,7 +883,7 @@ private:
 		Farm f;
 
 		boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-		bool whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() =< 30;
+		bool whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() < 30;
 		bool changed = false;
 
 		while (true) {
