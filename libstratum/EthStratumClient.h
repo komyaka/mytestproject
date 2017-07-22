@@ -58,6 +58,7 @@ private:
 	bool m_authorized;
 	bool m_connected;
 	bool m_running = true;
+	bool m_whois = false;
 
 	int	m_retries = 0;
 	int	m_maxRetries;

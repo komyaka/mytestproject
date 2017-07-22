@@ -113,6 +113,7 @@ void EthStratumClient::reconnect(bool whois)
 	m_authorized = false;
 	m_connected = false;
 
+	m_whois = whois;
 	p_active = whois ? &m_devfee : &m_primary;
 		
 	if (!m_failover.host.empty())
@@ -168,7 +169,7 @@ void EthStratumClient::resolve_handler(const boost::system::error_code& ec, tcp:
 	else
 	{
 		cerr << "Could not resolve host" << p_active->host + ":" + p_active->port + ", " << ec.message();
-		reconnect();
+		reconnect(m_whois);
 	}
 }
 
@@ -230,7 +231,7 @@ void EthStratumClient::connect_handler(const boost::system::error_code& ec, tcp:
 	else
 	{
 		cwarn << "Could not connect to stratum server " << p_active->host << ":" << p_active->port << ", " << ec.message();
-		reconnect();
+		reconnect(m_whois);
 	}
 
 }
@@ -297,7 +298,7 @@ void EthStratumClient::readResponse(const boost::system::error_code& ec, std::si
 	{
 		cwarn << "Read response failed: " << ec.message();
 		if (m_connected)
-			reconnect();
+			reconnect(m_whois);
 	}
 }
 
@@ -505,7 +506,7 @@ void EthStratumClient::processReponse(Json::Value& responseObject)
 void EthStratumClient::work_timeout_handler(const boost::system::error_code& ec) {
 	if (!ec) {
 		cnote << "No new work received in" << m_worktimeout << "seconds.";
-		reconnect();
+		reconnect(m_whois);
 	}
 }
 
