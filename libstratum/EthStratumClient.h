@@ -37,7 +37,6 @@ public:
 private:
 	void connect();
 	
-	void disconnect();
 	void resolve_handler(const boost::system::error_code& ec, tcp::resolver::iterator i);
 	void connect_handler(const boost::system::error_code& ec, tcp::resolver::iterator i);
 	void work_timeout_handler(const boost::system::error_code& ec);

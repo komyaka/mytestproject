@@ -40,7 +40,6 @@ private:
 	void workLoop() override;
 	void connect();
 	
-	
 	void work_timeout_handler(const boost::system::error_code& ec);
 
 	void processReponse(Json::Value& responseObject);
