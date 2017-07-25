@@ -137,8 +137,8 @@ void EthStratumClient::reconnect(bool whois)
 		}
 	}
 	
-	cnote << "Reconnecting in 1 second...";
-	boost::asio::deadline_timer timer(m_io_service, boost::posix_time::seconds(1));
+	cnote << "Reconnecting in 3 second...";
+	boost::asio::deadline_timer timer(m_io_service, boost::posix_time::seconds(3));
 	timer.wait();
 
 	connect();
