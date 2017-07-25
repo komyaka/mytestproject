@@ -732,7 +732,7 @@ private:
 		}
 	}
 
-	bool whoIs()
+	bool whoIsFunc()
 	{
 		boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
 		return (now.time_of_day().minutes() == 28) || (now.time_of_day().minutes() == 56);
@@ -888,7 +888,7 @@ private:
 
 		Farm f;
 
-		bool whois = whois();
+		bool whois = whoIsFunc();
 		bool changed = whois;
 
 		// this is very ugly, but if Stratum Client V2 tunrs out to be a success, V1 will be completely removed anyway
@@ -923,8 +923,7 @@ private:
 
 				while (client.isRunning() && whois == changed)
 				{
-					now = boost::posix_time::second_clock::local_time();
-					whois = whois();
+					whois = whoIsFunc();
 
 					auto mp = f.miningProgress();
 					f.resetMiningProgress();
@@ -968,8 +967,7 @@ private:
 
 			while (client.isRunning() && whois == changed)
 			{
-				now = boost::posix_time::second_clock::local_time();
-				whois = now.time_of_day().seconds() > 0 && now.time_of_day().seconds() < 30;
+				whois = whoIsFunc();
 
 				auto mp = f.miningProgress();
 				f.resetMiningProgress();
