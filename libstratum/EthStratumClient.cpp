@@ -359,11 +359,11 @@ void EthStratumClient::processReponse(Json::Value& responseObject)
 		m_authorized = responseObject.get("result", Json::Value::null).asBool();
 		if (!m_authorized)
 		{
-			cnote << "Worker not authorized:" << m_primary->user;
+			cnote << "Worker not authorized:";
 			disconnect();
 			return;
 		}
-		cnote << "Authorized worker " << m_primary->user;
+		cnote << "Authorized worker ";
 		break;
 	case 4:
 		if (responseObject.get("result", false).asBool()) {
